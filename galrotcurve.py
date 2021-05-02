@@ -2,12 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """ 
+GalaxyRotationCurve
+------------------- 
+
 A class to calculate the rotation curve of a galaxy assuming
  an axisymmetric model composed by a dark matter halo, disc, and
  a spherical bulge.
 
- F. G. Ramon-Fox 2021
- Last revision: May 2021
+F. G. Ramon-Fox 2021
+Last revision: May 2021
+
 """
 
 import numpy as np
@@ -223,8 +227,24 @@ class GalaxyRotationCurve:
         self._c = float(new_c)
         
     def get_halo_rotation_curve(self, r):
-        """ Returns the rotation curve of the dark matter halo as a function
-          of r, assuming a Navarro-Frenk-White (1996) profile and spherical symmetry. 
+        """ 
+        Returns the rotation curve of the dark matter halo as a function
+        of r, assuming a Navarro-Frenk-White (1996) profile and spherical 
+        symmetry.
+        
+        Parameters
+        ----------
+        r : array-like
+            radial position array in natural (code) units.
+            
+        Returns
+        -------
+        vh_rot :
+            rotation curve of the dark halo in natural units.
+            
+        Notes
+        -----
+        Multiply vh_rot by your unit velocity to convert to physical units.
         """
         
         x = r/self._rs
@@ -236,8 +256,23 @@ class GalaxyRotationCurve:
         return vh_rot
         
     def get_disc_rotation_curve_gas(self, R):
-        """ Returns the rotation curve of a gas disc with an exponential surface
-          density profile. The mass of the disc is Mg = Md * gasfrac 
+        """ 
+        Returns the rotation curve of a gas disc with an exponential surface
+        density profile. The mass of the gas disc is Mgas = Md * gasfrac.
+        
+        Parameters
+        ----------
+        R : array-like
+            radial position array in natural (code) units.
+            
+        Returns
+        -------
+        vd_rot :
+            rotation curve of the gas disc in natural units.
+            
+        Notes
+        -----
+        Multiply vd_rot by your unit velocity to convert to physical units.
         """
 
         Mgas = self._Md * self._gfrac
@@ -247,8 +282,23 @@ class GalaxyRotationCurve:
         return vd_rot
         
     def get_disc_rotation_curve_stars(self, R):
-        """ Returns the rotation curve of a stellar disc with an exponential surface
-          density profile. The mass of the disc is Mg = Md * gasfrac. 
+        """ 
+        Returns the rotation curve of a stellar disc with an exponential surface
+        density profile. The mass of the stellar disc is Mstars = Md * gasfrac.
+        
+        Parameters
+        ----------
+        R : array-like
+            radial position array in natural (code) units.
+            
+        Returns
+        -------
+        vd_rot :
+            rotation curve of the stellar disc in natural units.
+            
+        Notes
+        -----
+        Multiply vd_rot by your unit velocity to convert to physical units.
         """
 
         Mstars = self._Md * self._sfrac
@@ -258,6 +308,25 @@ class GalaxyRotationCurve:
         return vd_rot
     
     def __get_disc_rotation_curve(self, Mdisc, Rdisc, R):
+        """
+        Returns the squared of the circular velocity of a disc with an 
+        exponential surface density profile.
+        
+        Parameters
+        ----------
+        R : array-like
+            radial position array in natural (code) units.
+            
+        Returns
+        -------
+        vd_rotsqd :
+            squared of the circular velocity of the disc in natural units.
+            
+        Notes
+        -----
+        Do not forget to apply the square root and multiply by velocity unit.
+        This function is aimed for internal use only.
+        """
         
         y = R/(2.0 * Rdisc)
         vd_rotsqd = (2.0 * GalaxyRotationCurve.G * Mdisc/Rdisc) * y**2.0 \
@@ -266,8 +335,23 @@ class GalaxyRotationCurve:
         return vd_rotsqd
     
     def get_bulge_rotation_curve(self, r):
-        """ Returns the rotation curve of a spherical bulge with the density
-          profile of Hernquist (1990). 
+        """ 
+        Returns the rotation curve of a spherical bulge with the density
+        profile of Hernquist (1990).
+        
+        Parameters
+        ----------
+        r : array-like
+            radial position array in natural (code) units.
+            
+        Returns
+        -------
+        vb_rot :
+            rotation curve of the bulge in natural units.
+            
+        Notes
+        -----
+        Multiply vb_rot by your unit velocity to convert to physical units.
         """
         
         xi = r/self._rb
@@ -278,7 +362,22 @@ class GalaxyRotationCurve:
         return vb_rot
 
     def get_full_rotation_curve(self, r):
-        """ Returns the total rotation curve of the galactic model 
+        """ 
+        Returns the total rotation curve of the specified galactic model.
+        
+        Parameters
+        ----------
+        r : array-like
+            radial position array in natural (code) units.
+            
+        Returns
+        -------
+        vrot :
+            rotation curve of the galactic model in natural units..
+            
+        Notes
+        -----
+        Multiply vrot by your unit velocity to convert to physical units.
         """
         vh_rotsqd = (self.get_halo_rotation_curve(r))**2
         vd_rotsqd = (self.get_disc_rotation_curve_stars(r))**2.0
