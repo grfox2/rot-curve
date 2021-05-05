@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """ 
-GalaxyRotationCurve
+Module: galrotcurve
 ------------------- 
 
-A class to calculate the rotation curve of a galaxy assuming
- an axisymmetric model composed by a dark matter halo, disc, and
- a spherical bulge.
+Provides a class to calculate the rotation curve of a galaxy assuming
+an axisymmetric model composed by a dark matter halo, disc, and
+a spherical bulge.
 
 F. G. Ramon-Fox 2021
 Last revision: May 2021
@@ -19,7 +19,8 @@ import scipy.special as sp
 
 class GalaxyRotationCurve:
     """
-    GalaxyRotationCurve
+    Class: GalaxyRotationCurve
+    ---------------------------
      
     Provides functions to calculate the rotation curve of a galaxy assuming
     an axisymmetric model composed by a dark matter halo, a stellar disc, 
@@ -36,26 +37,26 @@ class GalaxyRotationCurve:
      
     Attributes
     ----------
-        Md : float or int
-            Disc mass in natural units (G=1.0).
-        Rg : float or int
-            Gas disc scale radius in natural units.
-        Rd : float or int
-            Stellar disc scale radius in natural units.
-        gfrac : float or int
-            Gas fraction (0 to 1.)
-        sfrac : float or int
-            Stellar fraction (0 to 1.)
-        Mb : float or int
-            Bulge mass in natural units.
-        rb : float or int
-            Bulge scale radius in natural units.
-        Mh : float or int
-            Dark halo mass in natural units.
-        c : float or int
-            Halo concentration parameter.
-        rs : float or int
-            Halo scale radius in natural units.
+    Md : float or int
+        Disc mass in natural units (G=1.0).
+    Rg : float or int
+        Gas disc scale radius in natural units.
+    Rd : float or int
+        Stellar disc scale radius in natural units.
+    gfrac : float or int
+        Gas fraction (0 to 1.)
+    sfrac : float or int
+        Stellar fraction (0 to 1.)
+    Mb : float or int
+        Bulge mass in natural units.
+    rb : float or int
+        Bulge scale radius in natural units.
+    Mh : float or int
+        Dark halo mass in natural units.
+    c : float or int
+        Halo concentration parameter.
+    rs : float or int
+        Halo scale radius in natural units.
     
     Instantiation
     -------------   
@@ -247,6 +248,9 @@ class GalaxyRotationCurve:
         Multiply vh_rot by your unit velocity to convert to physical units.
         """
         
+        if not isinstance(r, np.ndarray):
+            raise TypeError("r must be a ndarray.")
+        
         x = r/self._rs
         gc = np.log(1.0 + self._c) - self._c/(1.0 + self._c)
         vh_rotsqd = (GalaxyRotationCurve.G * self._Mh/self._rs) * 1.0/gc \
@@ -275,6 +279,9 @@ class GalaxyRotationCurve:
         Multiply vd_rot by your unit velocity to convert to physical units.
         """
 
+        if not isinstance(R, np.ndarray):
+            raise TypeError("R must be a ndarray.")
+
         Mgas = self._Md * self._gfrac
         vd_rotsqd = self.__get_disc_rotation_curve(Mgas, self._Rd, R)
         vd_rot = np.sqrt(vd_rotsqd)
@@ -300,6 +307,9 @@ class GalaxyRotationCurve:
         -----
         Multiply vd_rot by your unit velocity to convert to physical units.
         """
+
+        if not isinstance(R, np.ndarray):
+            raise TypeError("R must be a ndarray.")
 
         Mstars = self._Md * self._sfrac
         vd_rotsqd = self.__get_disc_rotation_curve(Mstars, self._Rd, R)        
@@ -328,6 +338,13 @@ class GalaxyRotationCurve:
         This function is aimed for internal use only.
         """
         
+        if not isinstance(Mdisc, float):
+            raise TypeError("Mdisc must be a float.")
+        if not isinstance(Rdisc, float):
+            raise TypeError("Rdisc must be a float.")
+        if not isinstance(R, np.ndarray):
+            raise TypeError("R must be a ndarray.")
+        
         y = R/(2.0 * Rdisc)
         vd_rotsqd = (2.0 * GalaxyRotationCurve.G * Mdisc/Rdisc) * y**2.0 \
             * (sp.iv(0,y)*sp.kv(0,y) - sp.iv(1,y)*sp.kv(1,y))
@@ -354,6 +371,9 @@ class GalaxyRotationCurve:
         Multiply vb_rot by your unit velocity to convert to physical units.
         """
         
+        if not isinstance(r, np.ndarray):
+            raise TypeError("r must be a ndarray.")
+        
         xi = r/self._rb
         vb_rotsqd = (GalaxyRotationCurve.G * self._Mb/self._rb) * \
             (xi/(1.0 + xi)**2.0)
@@ -379,6 +399,10 @@ class GalaxyRotationCurve:
         -----
         Multiply vrot by your unit velocity to convert to physical units.
         """
+        
+        if not isinstance(r, np.ndarray):
+            raise TypeError("r must be a ndarray.")
+        
         vh_rotsqd = (self.get_halo_rotation_curve(r))**2
         vd_rotsqd = (self.get_disc_rotation_curve_stars(r))**2.0
         vg_rotsqd = (self.get_disc_rotation_curve_gas(r))**2.0
